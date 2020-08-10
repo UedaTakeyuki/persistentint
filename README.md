@@ -1,5 +1,5 @@
 # persistentint
-Integer value which exist in persistent
+Integer value which exist in persistent.
 
 ## How to use
 ```go:
