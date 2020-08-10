@@ -24,26 +24,28 @@ func NewPersistentInt64(path string) (p *PersistentInt64, err error) {
 }
 
 func (i PersistentInt64) Save() (err error) {
-	ioutil.WriteFile(i.path, []byte(strconv.FormatInt(i.Value, 10)), os.FileMode(0600))
+	err = ioutil.WriteFile(i.path, []byte(strconv.FormatInt(i.Value, 10)), os.FileMode(0600))
 	return err
 }
 
-func (i *PersistentInt64) Inc() (int64, err error) {
+func (i *PersistentInt64) Inc() (value int64, err error) {
 	// lock
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
 	i.Value++
-	i.Save()
-	return i.Value, err
+	value = i.Value
+	err = i.Save()
+	return
 }
 
-func (i *PersistentInt64) Add(j int64) (int64, err error) {
+func (i *PersistentInt64) Add(j int64) (value int64, err error) {
 	// lock
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
 	i.Value += j
-	i.Save()
-	return i.Value, err
+	value = i.Value
+	err = i.Save()
+	return
 }

@@ -24,26 +24,28 @@ func NewPersistentInt(path string) (p *PersistentInt, err error) {
 }
 
 func (i PersistentInt) Save() (err error) {
-	ioutil.WriteFile(i.path, []byte(strconv.Itoa(i.Value)), os.FileMode(0600))
+	err = ioutil.WriteFile(i.path, []byte(strconv.Itoa(i.Value)), os.FileMode(0600))
 	return err
 }
 
-func (i *PersistentInt) Inc() (int, err error) {
+func (i *PersistentInt) Inc() (value int, err error) {
 	// lock
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
 	i.Value++
-	i.Save()
-	return i.Value, err
+	value = i.Value
+	err = i.Save()
+	return
 }
 
-func (i *PersistentInt) Add(j int) (int, err error) {
+func (i *PersistentInt) Add(j int) (value int, err error) {
 	// lock
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
 	i.Value += j
-	i.Save()
-	return i.Value, err
+	value = i.Value
+	err = i.Save()
+	return
 }
