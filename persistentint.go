@@ -28,22 +28,22 @@ func (i PersistentInt) Save() (err error) {
 	return err
 }
 
-func (i *PersistentInt) Inc() (err error) {
+func (i *PersistentInt) Inc() (int, err error) {
 	// lock
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
 	i.Value++
 	i.Save()
-	return err
+	return i.Value, err
 }
 
-func (i *PersistentInt) Add(j int) (err error) {
+func (i *PersistentInt) Add(j int) (int, err error) {
 	// lock
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
 	i.Value += j
 	i.Save()
-	return err
+	return i.Value, err
 }
