@@ -1,3 +1,8 @@
+// persistentint
+//
+// Copyright 2020 Aterier UEDA
+// Author: Takeyuki UEDA
+
 package persistentint
 
 import (
