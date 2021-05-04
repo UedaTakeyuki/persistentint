@@ -134,7 +134,7 @@ func (i PersistentInt) readDB() (value int, err error) {
 	var errStr string
 
 	if i.db.SQLiteHandle.SQLiteptr != nil {
-		if value, err := i.sqliteRead(); err != nil {
+		if value, err = i.sqliteRead(); err != nil {
 			errStr += err.Error()
 			log.Println(err)
 		} else {
@@ -142,7 +142,7 @@ func (i PersistentInt) readDB() (value int, err error) {
 		}
 	}
 	if i.db.MariadbHandle.Mariadbptr != nil {
-		if value, err := i.mariadbRead(); err != nil {
+		if value, err = i.mariadbRead(); err != nil {
 			errStr += err.Error()
 			log.Println(err)
 		} else {
@@ -150,13 +150,17 @@ func (i PersistentInt) readDB() (value int, err error) {
 		}
 	}
 	if i.db.FirebaseHandle.Client != nil {
-		if value, err := i.firebaseRead(); err != nil {
+		if value, err = i.firebaseRead(); err != nil {
 			errStr += err.Error()
 			log.Panicln(err)
 		} else {
 			return
 		}
 	}
+}
+
+func (i PersistentInt) sqliteRead() (value int, err error) {
+	return
 }
 
 func (i PersistentInt) mariadbRead() (value int, err error) {
