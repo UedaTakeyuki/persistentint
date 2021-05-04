@@ -108,7 +108,7 @@ func (i PersistentInt) sqliteSave() (err error) {
 		i.tname,
 		i.cname,
 		i.fname,
-		i.Value
+		i.Value,
 		i.cname,
 	)
 	err = i.db.SQLiteHandle.Exec(query)
