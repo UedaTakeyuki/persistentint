@@ -49,7 +49,7 @@ func NewPersistentIntWithDB(db dbhandle.DBHandle, tname string, cname string, fn
 	p.fname = fname
 //	filebuffs, err := ioutil.ReadFile(p.path)
 //	p.Value, err = strconv.Atoi(string(filebuffs))
-	p.Value = p.readDB()
+	p.Value, err = p.readDB()
 
 	return	
 }
@@ -64,7 +64,7 @@ func NewPersistentIntWithDBAndPath(db dbhandle.DBHandle, tname string, cname str
 	p.fname = fname
 //	filebuffs, err := ioutil.ReadFile(p.path)
 //	p.Value, err = strconv.Atoi(string(filebuffs))
-	p.Value = p.readDB()
+	p.Value, err = p.readDB()
 }
 
 // read from path, save all
@@ -77,7 +77,7 @@ func NewPersistentIntWithPATHAndDB(path string, db dbhandle.DBHandle, tname stri
 	p.fname = fname
 	filebuffs, err := ioutil.ReadFile(p.path)
 	p.Value, err = strconv.Atoi(string(filebuffs))
-//	p.Value = p.readDB()
+//	p.Value, err = p.readDB()
 }
 
 func (i PersistentInt) saveDB() (err error) {
@@ -121,6 +121,40 @@ func (i PersistentInt) sqliteSave() (err error) {
 func (i PersistentInt) sqliteSave() (err error) {
 }
 
+func (i PersistentInt) readDB() (value int, err error) {
+	var errStr string
+
+	if db.SQLiteHandle.SQLiteptr != nil {
+		if value, err := sqliteRead(); err != nil {
+			errStr += err.Error()
+			log.Println(err)
+		} else {
+			return
+		}
+	}
+	if db.MariadbHandle.Mariadbptr != nil {
+		if value, err := mariadbRead(); err != nil {
+			errStr += err.Error()
+			log.Println(err)
+		} else {
+			return
+		}
+	}
+	if db.FirebaseHandle.Client != nil {
+		if value, err := firebaseRead(); err != nil {
+			errStr += err.Error()
+			log.Panicln(err)
+		} else {
+			return
+		}
+	}
+}
+
+func (i PersistentInt) mariadbRead() (value int, err error) {
+}
+
+func (i PersistentInt) firebaseRead() (value int, err error) {
+}
 
 // v1.1 end
 
