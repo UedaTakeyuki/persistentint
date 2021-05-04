@@ -79,11 +79,55 @@ func NewPersistentIntWithPATHAndDB(path string, db dbhandle.DBHandle, tname stri
 	p.Value, err = strconv.Atoi(string(filebuffs))
 //	p.Value = p.readDB()
 }
+
+func (i PersistentInt) saveDB() (err error) {
+	var errStr string
+
+	if db.SQLiteHandle.SQLiteptr != nil {
+		if err := sqliteSave(); err != nil {
+			errStr += err.Error()
+			log.Println(err)
+		}
+	}
+	if db.MariadbHandle.Mariadbptr != nil {
+		if err := mariadbSave(); err != nil {
+			errStr += err.Error()
+			log.Println(err)
+		}
+	}
+	if db.FirebaseHandle.Client != nil {
+		if err := firebaseSave(); err != nil {
+			errStr += err.Error()
+			log.Panicln(err)
+		}
+	}
+}
+
+func (i PersistentInt) sqliteSave() (err error) {
+	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
+		i.tname,
+		i.cname,
+		i.fname,
+		i.Value
+		i.cname,
+	)
+	err = i.db.SQLiteHandle.Exec(query)
+	return
+}
+
+func (i PersistentInt) sqliteSave() (err error) {
+}
+
+func (i PersistentInt) sqliteSave() (err error) {
+}
+
+
 // v1.1 end
 
 func (i PersistentInt) Save() (err error) {
 	var pathErr error
 	var dbErr error
+	// v1.1 start
 	if i.path != nil {
 		pathErr = ioutil.WriteFile(i.path, []byte(strconv.Itoa(i.Value)), os.FileMode(0600))
 	}
@@ -98,6 +142,7 @@ func (i PersistentInt) Save() (err error) {
 		errStr += dbErr.Error()
 	}
 	err = errors.New(errStr)
+	// v1.1 end
 	return err
 }
 
