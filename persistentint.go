@@ -24,7 +24,7 @@ type PersistentInt struct {
 	path  string
 	// v1.1 start
 	// for db
-	db    dbhandle.DBHandle
+	db    *dbhandle.DBHandle
 	tname string // table name
 	cname string // column name
 	fname string // json field name
@@ -42,7 +42,7 @@ func NewPersistentInt(path string) (p *PersistentInt, err error) {
 }
 
 // v1.1 start
-func NewPersistentIntWithDB(db dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt, err error){
+func NewPersistentIntWithDB(db *dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt, err error){
 	p = new(PersistentInt)
 //	p.path = path
 	p.db = db
@@ -57,10 +57,10 @@ func NewPersistentIntWithDB(db dbhandle.DBHandle, tname string, cname string, fn
 }
 
 // read from db, save all
-func NewPersistentIntWithDBAndPath(db dbhandle.DBHandle, tname string, cname string, fname string, path string) (p *PersistentInt, err error){
+func NewPersistentIntWithDBAndPath(db *dbhandle.DBHandle, tname string, cname string, fname string, path string) (p *PersistentInt, err error){
 	p = new(PersistentInt)
 	p.path = path
-	p.db = *db
+	p.db = db
 	p.tname = tname
 	p.cname = cname
 	p.fname = fname
@@ -72,7 +72,7 @@ func NewPersistentIntWithDBAndPath(db dbhandle.DBHandle, tname string, cname str
 }
 
 // read from path, save all
-func NewPersistentIntWithPATHAndDB(path string, db dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt, err error){
+func NewPersistentIntWithPATHAndDB(path string, db *dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt, err error){
 	p = new(PersistentInt)
 	p.path = path
 	p.db = db
