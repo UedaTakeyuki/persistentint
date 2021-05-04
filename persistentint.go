@@ -87,20 +87,20 @@ func NewPersistentIntWithPATHAndDB(path string, db dbhandle.DBHandle, tname stri
 func (i PersistentInt) saveDB() (err error) {
 	var errStr string
 
-	if db.SQLiteHandle.SQLiteptr != nil {
-		if err := sqliteSave(); err != nil {
+	if i.db.SQLiteHandle.SQLiteptr != nil {
+		if err := i.sqliteSave(); err != nil {
 			errStr += err.Error()
 			log.Println(err)
 		}
 	}
-	if db.MariadbHandle.Mariadbptr != nil {
-		if err := mariadbSave(); err != nil {
+	if i.db.MariadbHandle.Mariadbptr != nil {
+		if err := i.mariadbSave(); err != nil {
 			errStr += err.Error()
 			log.Println(err)
 		}
 	}
-	if db.FirebaseHandle.Client != nil {
-		if err := firebaseSave(); err != nil {
+	if i.db.FirebaseHandle.Client != nil {
+		if err := i.firebaseSave(); err != nil {
 			errStr += err.Error()
 			log.Panicln(err)
 		}
