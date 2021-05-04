@@ -60,7 +60,7 @@ func NewPersistentIntWithDB(db dbhandle.DBHandle, tname string, cname string, fn
 func NewPersistentIntWithDBAndPath(db dbhandle.DBHandle, tname string, cname string, fname string, path string) (p *PersistentInt, err error){
 	p = new(PersistentInt)
 	p.path = path
-	p.db = db
+	p.db = *db
 	p.tname = tname
 	p.cname = cname
 	p.fname = fname
@@ -157,6 +157,7 @@ func (i PersistentInt) readDB() (value int, err error) {
 			return
 		}
 	}
+	return
 }
 
 func (i PersistentInt) sqliteRead() (value int, err error) {
@@ -177,7 +178,7 @@ func (i PersistentInt) Save() (err error) {
 	var pathErr error
 	var dbErr error
 	// v1.1 start
-	if i.path != nil {
+	if i.path != "" {
 		pathErr = ioutil.WriteFile(i.path, []byte(strconv.Itoa(i.Value)), os.FileMode(0600))
 	}
 	if i.db != nil {
