@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"sync"
 	"log"
+	"fmt"
 	
 	// v1.1	
 	"errors"
@@ -132,24 +133,24 @@ func (i PersistentInt) firebaseSave() (err error) {
 func (i PersistentInt) readDB() (value int, err error) {
 	var errStr string
 
-	if db.SQLiteHandle.SQLiteptr != nil {
-		if value, err := sqliteRead(); err != nil {
+	if i.db.SQLiteHandle.SQLiteptr != nil {
+		if value, err := i.sqliteRead(); err != nil {
 			errStr += err.Error()
 			log.Println(err)
 		} else {
 			return
 		}
 	}
-	if db.MariadbHandle.Mariadbptr != nil {
-		if value, err := mariadbRead(); err != nil {
+	if i.db.MariadbHandle.Mariadbptr != nil {
+		if value, err := i.mariadbRead(); err != nil {
 			errStr += err.Error()
 			log.Println(err)
 		} else {
 			return
 		}
 	}
-	if db.FirebaseHandle.Client != nil {
-		if value, err := firebaseRead(); err != nil {
+	if i.db.FirebaseHandle.Client != nil {
+		if value, err := i.firebaseRead(); err != nil {
 			errStr += err.Error()
 			log.Panicln(err)
 		} else {
