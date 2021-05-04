@@ -65,6 +65,8 @@ func NewPersistentIntWithDBAndPath(db dbhandle.DBHandle, tname string, cname str
 //	filebuffs, err := ioutil.ReadFile(p.path)
 //	p.Value, err = strconv.Atoi(string(filebuffs))
 	p.Value, err = p.readDB()
+
+	return
 }
 
 // read from path, save all
@@ -78,6 +80,8 @@ func NewPersistentIntWithPATHAndDB(path string, db dbhandle.DBHandle, tname stri
 	filebuffs, err := ioutil.ReadFile(p.path)
 	p.Value, err = strconv.Atoi(string(filebuffs))
 //	p.Value, err = p.readDB()
+	
+	return
 }
 
 func (i PersistentInt) saveDB() (err error) {
@@ -101,6 +105,7 @@ func (i PersistentInt) saveDB() (err error) {
 			log.Panicln(err)
 		}
 	}
+	return
 }
 
 func (i PersistentInt) sqliteSave() (err error) {
@@ -116,9 +121,11 @@ func (i PersistentInt) sqliteSave() (err error) {
 }
 
 func (i PersistentInt) sqliteSave() (err error) {
+	return
 }
 
 func (i PersistentInt) sqliteSave() (err error) {
+	return
 }
 
 func (i PersistentInt) readDB() (value int, err error) {
@@ -151,9 +158,11 @@ func (i PersistentInt) readDB() (value int, err error) {
 }
 
 func (i PersistentInt) mariadbRead() (value int, err error) {
+	return
 }
 
 func (i PersistentInt) firebaseRead() (value int, err error) {
+	return
 }
 
 // v1.1 end
