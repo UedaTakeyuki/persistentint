@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"log"
 	
 	// v1.1	
 	"errors"
@@ -120,11 +121,11 @@ func (i PersistentInt) sqliteSave() (err error) {
 	return
 }
 
-func (i PersistentInt) sqliteSave() (err error) {
+func (i PersistentInt) mariadbSave() (err error) {
 	return
 }
 
-func (i PersistentInt) sqliteSave() (err error) {
+func (i PersistentInt) firebaseSave() (err error) {
 	return
 }
 
