@@ -16,6 +16,8 @@ import (
 	// v1.1	
 	"errors"
 	"github.com/UedaTakeyuki/dbhandle"
+	"github.com/UedaTakeyuki/erapse"
+	"time"
 )
 
 // PersistentInt
@@ -33,6 +35,8 @@ type PersistentInt struct {
 }
 
 func NewPersistentInt(path string) (p *PersistentInt, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+	
 	p = new(PersistentInt)
 	p.path = path
 	filebuffs, err := ioutil.ReadFile(p.path)
@@ -43,6 +47,8 @@ func NewPersistentInt(path string) (p *PersistentInt, err error) {
 
 // v1.1 start
 func NewPersistentIntWithDB(db *dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt, err error){
+	defer erapse.ShowErapsedTIme(time.Now())
+	
 	p = new(PersistentInt)
 //	p.path = path
 	p.db = db
@@ -58,6 +64,8 @@ func NewPersistentIntWithDB(db *dbhandle.DBHandle, tname string, cname string, f
 
 // read from db, save all
 func NewPersistentIntWithDBAndPath(db *dbhandle.DBHandle, tname string, cname string, fname string, path string) (p *PersistentInt, err error){
+	defer erapse.ShowErapsedTIme(time.Now())
+	
 	p = new(PersistentInt)
 	p.path = path
 	p.db = db
@@ -73,6 +81,8 @@ func NewPersistentIntWithDBAndPath(db *dbhandle.DBHandle, tname string, cname st
 
 // read from path, save all
 func NewPersistentIntWithPATHAndDB(path string, db *dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt, err error){
+	defer erapse.ShowErapsedTIme(time.Now())
+	
 	p = new(PersistentInt)
 	p.path = path
 	p.db = db
@@ -87,6 +97,8 @@ func NewPersistentIntWithPATHAndDB(path string, db *dbhandle.DBHandle, tname str
 }
 
 func (i PersistentInt) saveDB() (err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+	
 	var errStr string
 
 	if i.db.SQLiteHandle.SQLiteptr != nil {
@@ -111,6 +123,8 @@ func (i PersistentInt) saveDB() (err error) {
 }
 
 func (i PersistentInt) sqliteSave() (err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+	
 	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
 		i.tname,
 		i.cname,
@@ -123,14 +137,34 @@ func (i PersistentInt) sqliteSave() (err error) {
 }
 
 func (i PersistentInt) mariadbSave() (err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+	
+	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
+		i.tname,
+		i.cname,
+		i.fname,
+		i.Value,
+		i.cname,
+	)
+	err = i.db.MariadbHandle.Exec(query)
 	return
 }
 
 func (i PersistentInt) firebaseSave() (err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+
+	_, err = client.Collection(i.tname).Doc(i.cname).Update(context.Background(), []firestore.Update{
+		{
+			Path:  i.fname,
+			Value: i.Value,
+		},
+	})
 	return
 }
 
 func (i PersistentInt) readDB() (value int, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+	
 	var errStr string
 
 	if i.db.SQLiteHandle.SQLiteptr != nil {
@@ -161,20 +195,44 @@ func (i PersistentInt) readDB() (value int, err error) {
 }
 
 func (i PersistentInt) sqliteRead() (value int, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+	
+	query := fmt.Sprintf(`SELECT  json_extract(attr, "$.%s") FROM %s WHERE id="%s"`, i.fname, i.tname, i.cname)
+	if err = db.SQLiteHandle.QueryRow(query, &attr); err != nil {
+		log.Println(err)
+		return
+	}
 	return
 }
 
 func (i PersistentInt) mariadbRead() (value int, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+	
+	query := fmt.Sprintf(`SELECT  json_extract(attr, "$.%s") FROM %s WHERE id="%s"`, i.fname, i.tname, i.cname)
+	if err = db.MariadbHandle.QueryRow(query, &attr); err != nil {
+		log.Println(err)
+		return
+	}
 	return
 }
 
 func (i PersistentInt) firebaseRead() (value int, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+	
+	dsnap, err := client.Collection(i.tname).Doc(i.cname).Get(context.Background())
+	if err == nil {
+		return
+	}
+	m = dsnap.Data().([string]interface{})
+	value = m[i.fname].(int)
 	return
 }
 
 // v1.1 end
 
 func (i PersistentInt) Save() (err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+	
 	var pathErr error
 	var dbErr error
 	// v1.1 start
@@ -197,6 +255,8 @@ func (i PersistentInt) Save() (err error) {
 }
 
 func (i *PersistentInt) Inc() (value int, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+	
 	// lock
 	i.mu.Lock()
 	defer i.mu.Unlock()
@@ -208,6 +268,8 @@ func (i *PersistentInt) Inc() (value int, err error) {
 }
 
 func (i *PersistentInt) Add(j int) (value int, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+	
 	// lock
 	i.mu.Lock()
 	defer i.mu.Unlock()
