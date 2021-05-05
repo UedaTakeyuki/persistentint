@@ -14,6 +14,7 @@ import (
 	"fmt"
 	
 	// v1.1	
+	"cloud.google.com/go/firestore"
 	"errors"
 	"github.com/UedaTakeyuki/dbhandle"
 	"github.com/UedaTakeyuki/erapse"
