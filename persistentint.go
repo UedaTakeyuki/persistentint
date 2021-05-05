@@ -200,7 +200,7 @@ func (i PersistentInt) sqliteRead() (value int, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 	
 	query := fmt.Sprintf(`SELECT  json_extract(attr, "$.%s") FROM %s WHERE id="%s"`, i.fname, i.tname, i.cname)
-	if err = i.db.SQLiteHandle.QueryRow(query, &attr); err != nil {
+	if err = i.db.SQLiteHandle.QueryRow(query, &value); err != nil {
 		log.Println(err)
 		return
 	}
@@ -225,7 +225,7 @@ func (i PersistentInt) firebaseRead() (value int, err error) {
 	if err == nil {
 		return
 	}
-	m := dsnap.Data().([string]interface{})
+	m := dsnap.Data().(map[string]interface{})
 	value = m[i.fname].(int)
 	return
 }
