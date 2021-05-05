@@ -155,7 +155,7 @@ func (i PersistentInt) mariadbSave() (err error) {
 func (i PersistentInt) firebaseSave() (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
-	_, err = i.db.Client.Collection(i.tname).Doc(i.cname).Update(context.Background(), []firestore.Update{
+	_, err = i.db.FirebaseHandle.Client.Collection(i.tname).Doc(i.cname).Update(context.Background(), []firestore.Update{
 		{
 			Path:  i.fname,
 			Value: i.Value,
@@ -211,7 +211,7 @@ func (i PersistentInt) mariadbRead() (value int, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 	
 	query := fmt.Sprintf(`SELECT  json_extract(attr, "$.%s") FROM %s WHERE id="%s"`, i.fname, i.tname, i.cname)
-	if err = db.MariadbHandle.QueryRow(query, &attr); err != nil {
+	if err = i.db.MariadbHandle.QueryRow(query, &value); err != nil {
 		log.Println(err)
 		return
 	}
@@ -221,11 +221,11 @@ func (i PersistentInt) mariadbRead() (value int, err error) {
 func (i PersistentInt) firebaseRead() (value int, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 	
-	dsnap, err := client.Collection(i.tname).Doc(i.cname).Get(context.Background())
+	dsnap, err := i.db.FirebaseHandle.Client.Collection(i.tname).Doc(i.cname).Get(context.Background())
 	if err == nil {
 		return
 	}
-	m = dsnap.Data().([string]interface{})
+	m := dsnap.Data().([string]interface{})
 	value = m[i.fname].(int)
 	return
 }
