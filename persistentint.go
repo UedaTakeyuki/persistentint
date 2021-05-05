@@ -225,8 +225,8 @@ func (i PersistentInt) firebaseRead() (value int, err error) {
 	if err == nil {
 		return
 	}
-	m := dsnap.Data().(map[string]interface{})
-	value = m[i.fname].(int)
+	m := dsnap.Data()
+	value = m.(map[string]interface{})[i.fname].(int)
 	return
 }
 
