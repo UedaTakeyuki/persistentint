@@ -226,7 +226,7 @@ func (i PersistentInt) firebaseRead() (value int, err error) {
 		return
 	}
 	m := dsnap.Data()
-	value = m.([] interface{})[i.fname].(int)
+	value = m.(map[string]interface {})[i.fname].(int)
 	return
 }
 
