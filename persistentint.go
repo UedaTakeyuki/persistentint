@@ -18,6 +18,7 @@ import (
 	"github.com/UedaTakeyuki/dbhandle"
 	"github.com/UedaTakeyuki/erapse"
 	"time"
+	"context"
 )
 
 // PersistentInt
@@ -153,7 +154,7 @@ func (i PersistentInt) mariadbSave() (err error) {
 func (i PersistentInt) firebaseSave() (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
-	_, err = client.Collection(i.tname).Doc(i.cname).Update(context.Background(), []firestore.Update{
+	_, err = i.db.Client.Collection(i.tname).Doc(i.cname).Update(context.Background(), []firestore.Update{
 		{
 			Path:  i.fname,
 			Value: i.Value,
@@ -198,7 +199,7 @@ func (i PersistentInt) sqliteRead() (value int, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 	
 	query := fmt.Sprintf(`SELECT  json_extract(attr, "$.%s") FROM %s WHERE id="%s"`, i.fname, i.tname, i.cname)
-	if err = db.SQLiteHandle.QueryRow(query, &attr); err != nil {
+	if err = i.db.SQLiteHandle.QueryRow(query, &attr); err != nil {
 		log.Println(err)
 		return
 	}
