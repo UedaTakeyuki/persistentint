@@ -20,6 +20,7 @@ import (
 	"github.com/UedaTakeyuki/erapse"
 	"time"
 	"context"
+	"reflect"
 )
 
 // PersistentInt
@@ -226,6 +227,7 @@ func (i PersistentInt) firebaseRead() (value int, err error) {
 		return
 	}
 	m := dsnap.Data()
+	log.Println("m",reflect.TypeOf(m))
 	value = m.(map[string]interface {})[i.fname].(int)
 	return
 }
