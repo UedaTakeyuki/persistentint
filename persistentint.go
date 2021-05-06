@@ -255,7 +255,9 @@ func (i PersistentInt) Save() (err error) {
 	if dbErr != nil {
 		errStr += dbErr.Error()
 	}
-	err = errors.New(errStr)
+	if errStr != "" {
+		err = errors.New(errStr)
+	}
 	// v1.1 end
 	return err
 }
