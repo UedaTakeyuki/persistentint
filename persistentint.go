@@ -156,12 +156,9 @@ func (i PersistentInt) mariadbSave() (err error) {
 func (i PersistentInt) firebaseSave() (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
-	_, err = i.db.FirebaseHandle.Client.Collection(i.tname).Doc(i.cname).Set(context.Background(), []firestore.Update{
-		{
-			Path:  i.fname,
-			Value: i.Value,
-		},
-	}, {merge: true})
+	_, err = i.db.FirebaseHandle.Client.Collection(i.tname).Doc(i.cname).Set(context.Background(), map[string]interface{}{
+        	i.fname: i.Value
+	}, firestore.MergeAll)
 	return
 }
 
