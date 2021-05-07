@@ -143,7 +143,7 @@ func (i PersistentInt) mariadbSave() (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 	
 //	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
-	query := fmt.Sprintf(`INSERT INTO %s (ID, Attr) VALUES (%s, JSON_SET(case json_valid("Attr") when "1" then "Attr" else '{}' end, "$.%s", "%d")) ON DUPLICATE KEY UPDATE ID = values(id), Attr=values(Attr)`,
+	query := fmt.Sprintf(`INSERT INTO %s (ID, Attr) VALUES ("%s", JSON_SET(case json_valid("Attr") when "1" then "Attr" else '{}' end, "$.%s", "%d")) ON DUPLICATE KEY UPDATE ID = values(id), Attr=values(Attr)`,
 		i.tname,
 		i.cname,
 		i.fname,
