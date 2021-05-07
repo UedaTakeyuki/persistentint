@@ -128,12 +128,12 @@ func (i PersistentInt) saveDB() (err error) {
 func (i PersistentInt) sqliteSave() (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 	
-	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
+//	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
+	query := fmt.Sprintf(`INSERT OR REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d"))`,
 		i.tname,
 		i.cname,
 		i.fname,
 		i.Value,
-		i.cname,
 	)
 	err = i.db.SQLiteHandle.Exec(query)
 	return
@@ -142,12 +142,12 @@ func (i PersistentInt) sqliteSave() (err error) {
 func (i PersistentInt) mariadbSave() (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 	
-	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
+//	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
+	query := fmt.Sprintf(`INSERT INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) ON DUPLICATE KEY UPDATE`,
 		i.tname,
 		i.cname,
 		i.fname,
 		i.Value,
-		i.cname,
 	)
 	err = i.db.MariadbHandle.Exec(query)
 	return
