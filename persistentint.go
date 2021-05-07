@@ -129,7 +129,7 @@ func (i PersistentInt) sqliteSave() (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 	
 //	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
-	query := fmt.Sprintf(`INSERT OR REPLACE INTO "%s" ("ID", "Attr") VALUES ("%s", JSON_SET(ATTR, "$.%s", "%d"))`,
+	query := fmt.Sprintf(`INSERT OR REPLACE INTO "%s" ("ID", "Attr") VALUES ("%s", JSON_SET("Attr", "$.%s", "%d"))`,
 		i.tname,
 		i.cname,
 		i.fname,
