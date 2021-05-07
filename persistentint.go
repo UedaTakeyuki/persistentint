@@ -161,7 +161,7 @@ func (i PersistentInt) firebaseSave() (err error) {
 			Path:  i.fname,
 			Value: i.Value,
 		},
-	}, firestore.MergeAll)
+	}, {merge: true})
 	return
 }
 
