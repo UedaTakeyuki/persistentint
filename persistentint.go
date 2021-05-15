@@ -95,7 +95,6 @@ func NewPersistentIntWithPATHAndDB(path string, db *dbhandle.DBHandle, tname str
 	filebuffs, err := ioutil.ReadFile(p.path)
 	p.Value, err = strconv.Atoi(string(filebuffs))
 //	p.Value, err = p.readDB()
-	log.Println("p.Value",p.Value)
 	
 	return
 }
