@@ -170,30 +170,14 @@ func (i PersistentInt) firebaseSave() (err error) {
 func (i PersistentInt) readDB() (value int, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
-	var errStr string
+	funcs := [...]func() (int, error){i.sqliteRead, i.mariadbRead, i.firebaseRead}
 
-	if i.db.SQLiteHandle.SQLiteptr != nil {
-		if value, err = i.sqliteRead(); err != nil {
-			errStr += err.Error()
-			log.Println(err)
-		} else {
+	for _, db := range usingDBsUsers {
+		if user_ptr, err = funcs[db](browserUid); err == nil {
 			return
-		}
-	}
-	if i.db.MariadbHandle.Mariadbptr != nil {
-		if value, err = i.mariadbRead(); err != nil {
-			errStr += err.Error()
-			log.Println(err)
 		} else {
-			return
-		}
-	}
-	if i.db.FirebaseHandle.Client != nil {
-		if value, err = i.firebaseRead(); err != nil {
-			errStr += err.Error()
-			log.Panicln(err)
-		} else {
-			return
+			dbhandle.LogInconsistent.Println(fmt.Sprintf("err: db = %s", dbhandle.Const2dbmsName(db)))
+			dbhandle.LogInconsistent.Println(err)
 		}
 	}
 	return
