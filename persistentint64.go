@@ -25,7 +25,15 @@ import (
 type PersistentInt64 struct {
 	Value int64
 	path  string
-	mu    sync.Mutex
+	// v1.1 start
+	// for db
+	db       *dbhandle.DBHandle // db handle
+	usingDBs []dbhandle.DBtype  // array of db type of using
+	tname    string             // table name
+	cname    string             // column name
+	fname    string             // json field name
+	// v1.1 end
+	mu sync.Mutex
 }
 
 func NewPersistentInt64(path string) (p *PersistentInt64, err error) {
@@ -44,6 +52,7 @@ func NewPersistentIntWithDB64(db *dbhandle.DBHandle, tname string, cname string,
 	p = new(PersistentInt64)
 	//	p.path = path
 	p.db = db
+	p.usingDBs = []dbhandle.DBtype{dbhandle.SQLite, dbhandle.Mariadb, dbhandle.FireStore}
 	p.tname = tname
 	p.cname = cname
 	p.fname = fname
@@ -61,6 +70,7 @@ func NewPersistentIntWithDBAndPath64(db *dbhandle.DBHandle, tname string, cname 
 	p = new(PersistentInt64)
 	p.path = path
 	p.db = db
+	p.usingDBs = []dbhandle.DBtype{dbhandle.SQLite, dbhandle.Mariadb, dbhandle.FireStore}
 	p.tname = tname
 	p.cname = cname
 	p.fname = fname
@@ -78,6 +88,7 @@ func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle.DBHandle, tname s
 	p = new(PersistentInt64)
 	p.path = path
 	p.db = db
+	p.usingDBs = []dbhandle.DBtype{dbhandle.SQLite, dbhandle.Mariadb, dbhandle.FireStore}
 	p.tname = tname
 	p.cname = cname
 	p.fname = fname
