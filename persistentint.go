@@ -172,8 +172,8 @@ func (i PersistentInt) readDB() (value int, err error) {
 
 	funcs := [...]func() (int, error){i.sqliteRead, i.mariadbRead, i.firebaseRead}
 
-	for _, db := range usingDBsUsers {
-		if user_ptr, err = funcs[db](browserUid); err == nil {
+	for _, db := range i.usingDBs {
+		if value, err = funcs[db](); err == nil {
 			return
 		} else {
 			dbhandle.LogInconsistent.Println(fmt.Sprintf("err: db = %s", dbhandle.Const2dbmsName(db)))
