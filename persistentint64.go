@@ -195,7 +195,7 @@ func (i PersistentInt64) readDB() (value int64, err error) {
 	return
 }
 
-func (i PersistentInt64) sqliteRead() (value int, err error) {
+func (i PersistentInt64) sqliteRead() (value int64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	query := fmt.Sprintf(`SELECT  json_extract(attr, "$.%s") FROM %s WHERE id="%s"`, i.fname, i.tname, i.cname)
@@ -206,7 +206,7 @@ func (i PersistentInt64) sqliteRead() (value int, err error) {
 	return
 }
 
-func (i PersistentInt64) mariadbRead() (value int, err error) {
+func (i PersistentInt64) mariadbRead() (value int64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	query := fmt.Sprintf(`SELECT  json_extract(attr, "$.%s") FROM %s WHERE id="%s"`, i.fname, i.tname, i.cname)
@@ -217,7 +217,7 @@ func (i PersistentInt64) mariadbRead() (value int, err error) {
 	return
 }
 
-func (i PersistentInt64) firebaseRead() (value int, err error) {
+func (i PersistentInt64) firebaseRead() (value int64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	dsnap, err := i.db.FirebaseHandle.Client.Collection(i.tname).Doc(i.cname).Get(context.Background())
