@@ -14,7 +14,7 @@ import (
 	"sync"
 
 	// v1.1
-	"context"
+
 	"errors"
 	"reflect"
 	"time"
@@ -111,10 +111,10 @@ func (i PersistentInt) saveDB() (err error) {
 	c := make(chan dbhandle.ExitStatus, 6)
 	defer close(c)
 
-	for _, db := range usingDBsUsers {
-		go funcs[db](id, browserUid, c)
+	for _, db := range i.usingDBs {
+		go funcs[db](c)
 	}
-	err = dbhandle.SaveUpdateErrorHandler(usingDBsUsers, fmt.Sprintf("table counter"), c)
+	err = dbhandle.SaveUpdateErrorHandler(usingDBs, fmt.Sprintf("table counter"), c)
 
 	/*
 		var errStr string
@@ -173,7 +173,7 @@ func (i PersistentInt) mariadbSave(c chan dbhandle.ExitStatus) (err error) {
 func (i PersistentInt) firebaseSave(c chan dbhandle.ExitStatus) (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
-	_, err = i.db.FirebaseHandle.Set(i.tname, i.cname, map[string]interface{}{
+	err = i.db.FirebaseHandle.Set(i.tname, i.cname, map[string]interface{}{
 		i.fname: i.Value,
 	})
 	c <- dbhandle.ExitStatus{WhichDB: dbhandle.FireStore, Err: err}
@@ -221,7 +221,7 @@ func (i PersistentInt) mariadbRead() (value int, err error) {
 func (i PersistentInt) firebaseRead() (value int, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
-	dsnap, err := i.db.FirebaseHandle.Get(i.tname, i.cname).Get(context.Background())
+	dsnap, err := i.db.FirebaseHandle.Get(i.tname, i.cname)
 	if err == nil {
 		return
 	}
