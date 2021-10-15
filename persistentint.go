@@ -114,7 +114,7 @@ func (i PersistentInt) saveDB() (err error) {
 	for _, db := range i.usingDBs {
 		go funcs[db](c)
 	}
-	err = dbhandle.SaveUpdateErrorHandler(usingDBs, fmt.Sprintf("table counter"), c)
+	err = dbhandle.SaveUpdateErrorHandler(i.usingDBs, fmt.Sprintf("table counter"), c)
 
 	/*
 		var errStr string
