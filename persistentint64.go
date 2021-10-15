@@ -38,7 +38,7 @@ func NewPersistentInt64(path string) (p *PersistentInt64, err error) {
 }
 
 // v1.1 start
-func NewPersistentIntWithDB(db *dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt64, err error) {
+func NewPersistentIntWithDB64(db *dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
@@ -55,7 +55,7 @@ func NewPersistentIntWithDB(db *dbhandle.DBHandle, tname string, cname string, f
 }
 
 // read from db, save all
-func NewPersistentIntWithDBAndPath(db *dbhandle.DBHandle, tname string, cname string, fname string, path string) (p *PersistentInt64, err error) {
+func NewPersistentIntWithDBAndPath64(db *dbhandle.DBHandle, tname string, cname string, fname string, path string) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
@@ -72,7 +72,7 @@ func NewPersistentIntWithDBAndPath(db *dbhandle.DBHandle, tname string, cname st
 }
 
 // read from path, save all
-func NewPersistentIntWithPATHAndDB(path string, db *dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt64, err error) {
+func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
