@@ -6,17 +6,19 @@
 package persistentint
 
 import (
-	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
-	"reflect"
 	"strconv"
 	"sync"
+
+	// v1.1
+
+	"reflect"
 	"time"
 
-	"cloud.google.com/go/firestore"
 	"github.com/UedaTakeyuki/dbhandle"
 	"github.com/UedaTakeyuki/erapse"
 )
@@ -37,6 +39,8 @@ type PersistentInt64 struct {
 }
 
 func NewPersistentInt64(path string) (p *PersistentInt64, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+
 	p = new(PersistentInt64)
 	p.path = path
 	filebuffs, err := ioutil.ReadFile(p.path)
@@ -103,30 +107,42 @@ func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle.DBHandle, tname s
 func (i PersistentInt64) saveDB() (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
-	var errStr string
+	funcs := [...]func(chan dbhandle.ExitStatus) error{i.sqliteSave, i.mariadbSave, i.firebaseSave}
 
-	if i.db.SQLiteHandle.SQLiteptr != nil {
-		if err := i.sqliteSave(); err != nil {
-			errStr += err.Error()
-			log.Println(err)
-		}
+	c := make(chan dbhandle.ExitStatus, 6)
+	defer close(c)
+
+	for _, db := range i.usingDBs {
+		go funcs[db](c)
 	}
-	if i.db.MariadbHandle.Mariadbptr != nil {
-		if err := i.mariadbSave(); err != nil {
-			errStr += err.Error()
-			log.Println(err)
+	err = dbhandle.SaveUpdateErrorHandler(i.usingDBs, fmt.Sprintf("table counter"), c)
+
+	/*
+		var errStr string
+
+		if i.db.SQLiteHandle.SQLiteptr != nil {
+			if err := i.sqliteSave(); err != nil {
+				errStr += err.Error()
+				log.Println(err)
+			}
 		}
-	}
-	if i.db.FirebaseHandle.Client != nil {
-		if err := i.firebaseSave(); err != nil {
-			errStr += err.Error()
-			log.Panicln(err)
+		if i.db.MariadbHandle.Mariadbptr != nil {
+			if err := i.mariadbSave(); err != nil {
+				errStr += err.Error()
+				log.Println(err)
+			}
 		}
-	}
+		if i.db.FirebaseHandle.Client != nil {
+			if err := i.firebaseSave(); err != nil {
+				errStr += err.Error()
+				log.Panicln(err)
+			}
+		}
+	*/
 	return
 }
 
-func (i PersistentInt64) sqliteSave() (err error) {
+func (i PersistentInt64) sqliteSave(c chan dbhandle.ExitStatus) (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	//	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
@@ -137,10 +153,11 @@ func (i PersistentInt64) sqliteSave() (err error) {
 		i.Value,
 	)
 	err = i.db.SQLiteHandle.Exec(query)
+	c <- dbhandle.ExitStatus{WhichDB: dbhandle.SQLite, Err: err}
 	return
 }
 
-func (i PersistentInt64) mariadbSave() (err error) {
+func (i PersistentInt64) mariadbSave(c chan dbhandle.ExitStatus) (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	//	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
@@ -151,45 +168,31 @@ func (i PersistentInt64) mariadbSave() (err error) {
 		i.Value,
 	)
 	err = i.db.MariadbHandle.Exec(query)
+	c <- dbhandle.ExitStatus{WhichDB: dbhandle.Mariadb, Err: err}
 	return
 }
 
-func (i PersistentInt64) firebaseSave() (err error) {
+func (i PersistentInt64) firebaseSave(c chan dbhandle.ExitStatus) (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
-	_, err = i.db.FirebaseHandle.Client.Collection(i.tname).Doc(i.cname).Set(context.Background(), map[string]interface{}{
+	err = i.db.FirebaseHandle.Set(i.tname, i.cname, map[string]interface{}{
 		i.fname: i.Value,
-	}, firestore.MergeAll)
+	})
+	c <- dbhandle.ExitStatus{WhichDB: dbhandle.FireStore, Err: err}
 	return
 }
 
 func (i PersistentInt64) readDB() (value int64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
-	var errStr string
+	funcs := [...]func() (int, error){i.sqliteRead, i.mariadbRead, i.firebaseRead}
 
-	if i.db.SQLiteHandle.SQLiteptr != nil {
-		if value, err = i.sqliteRead(); err != nil {
-			errStr += err.Error()
-			log.Println(err)
-		} else {
+	for _, db := range i.usingDBs {
+		if value, err = funcs[db](); err == nil {
 			return
-		}
-	}
-	if i.db.MariadbHandle.Mariadbptr != nil {
-		if value, err = i.mariadbRead(); err != nil {
-			errStr += err.Error()
-			log.Println(err)
 		} else {
-			return
-		}
-	}
-	if i.db.FirebaseHandle.Client != nil {
-		if value, err = i.firebaseRead(); err != nil {
-			errStr += err.Error()
-			log.Panicln(err)
-		} else {
-			return
+			dbhandle.LogInconsistent.Println(fmt.Sprintf("err: db = %s", dbhandle.Const2dbmsName(db)))
+			dbhandle.LogInconsistent.Println(err)
 		}
 	}
 	return
@@ -220,7 +223,7 @@ func (i PersistentInt64) mariadbRead() (value int64, err error) {
 func (i PersistentInt64) firebaseRead() (value int64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
-	dsnap, err := i.db.FirebaseHandle.Client.Collection(i.tname).Doc(i.cname).Get(context.Background())
+	dsnap, err := i.db.FirebaseHandle.Get(i.tname, i.cname)
 	if err == nil {
 		return
 	}
@@ -235,11 +238,34 @@ func (i PersistentInt64) firebaseRead() (value int64, err error) {
 // v1.1 end
 
 func (i PersistentInt64) Save() (err error) {
-	err = ioutil.WriteFile(i.path, []byte(strconv.FormatInt(i.Value, 10)), os.FileMode(0600))
+	defer erapse.ShowErapsedTIme(time.Now())
+
+	var pathErr error
+	var dbErr error
+	// v1.1 start
+	if i.path != "" {
+		pathErr = ioutil.WriteFile(i.path, []byte(strconv.Itoa(i.Value)), os.FileMode(0600))
+	}
+	if i.db != nil {
+		dbErr = i.saveDB()
+	}
+	var errStr string
+	if pathErr != nil {
+		errStr += pathErr.Error()
+	}
+	if dbErr != nil {
+		errStr += dbErr.Error()
+	}
+	if errStr != "" {
+		err = errors.New(errStr)
+	}
+	// v1.1 end
 	return err
 }
 
 func (i *PersistentInt64) Inc() (value int64, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+
 	// lock
 	i.mu.Lock()
 	defer i.mu.Unlock()
@@ -250,7 +276,9 @@ func (i *PersistentInt64) Inc() (value int64, err error) {
 	return
 }
 
-func (i *PersistentInt64) Add(j int64) (value int64, err error) {
+func (i *PersistentInt64) Add(j int) (value int64, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+
 	// lock
 	i.mu.Lock()
 	defer i.mu.Unlock()
