@@ -244,7 +244,7 @@ func (i PersistentInt64) Save() (err error) {
 	var dbErr error
 	// v1.1 start
 	if i.path != "" {
-		pathErr = ioutil.WriteFile(i.path, []byte(strconv.Itoa(i.Value)), os.FileMode(0600))
+		pathErr = ioutil.WriteFile(i.path, []byte(strconv.FormatInt(i.Value, 10)), os.FileMode(0600))
 	}
 	if i.db != nil {
 		dbErr = i.saveDB()
