@@ -276,7 +276,7 @@ func (i *PersistentInt64) Inc() (value int64, err error) {
 	return
 }
 
-func (i *PersistentInt64) Add(j int) (value int64, err error) {
+func (i *PersistentInt64) Add(j int64) (value int64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	// lock
