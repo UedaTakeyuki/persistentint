@@ -185,7 +185,7 @@ func (i PersistentInt64) firebaseSave(c chan dbhandle.ExitStatus) (err error) {
 func (i PersistentInt64) readDB() (value int64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
-	funcs := [...]func() (int, error){sqliteRead, mariadbRead, firebaseRead}
+	funcs := [...]func() (int64, error){i.sqliteRead, i.mariadbRead, i.firebaseRead}
 
 	for _, db := range i.usingDBs {
 		if value, err = funcs[db](); err == nil {
