@@ -103,6 +103,24 @@ func NewPersistentIntWithPATHAndDB(path string, db *dbhandle.DBHandle, tname str
 	return
 }
 
+// read from path, save all
+func NewPersistentIntWithPATHAndDBUsing(path string, db *dbhandle.DBHandle, tname string, cname string, fname string, usingDBs []dbhandle.DBtype) (p *PersistentInt, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+
+	p = new(PersistentInt)
+	p.path = path
+	p.db = db
+	p.usingDBs = usingDBs
+	p.tname = tname
+	p.cname = cname
+	p.fname = fname
+	filebuffs, err := ioutil.ReadFile(p.path)
+	p.Value, err = strconv.Atoi(string(filebuffs))
+	//	p.Value, err = p.readDB()
+
+	return
+}
+
 func (i PersistentInt) saveDB() (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
