@@ -19,7 +19,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/UedaTakeyuki/dbhandle"
+	"github.com/UedaTakeyuki/dbhandle2"
 	"github.com/UedaTakeyuki/erapse"
 )
 
@@ -29,11 +29,11 @@ type PersistentInt64 struct {
 	path  string
 	// v1.1 start
 	// for db
-	db       *dbhandle.DBHandle // db handle
-	usingDBs []dbhandle.DBtype  // array of db type of using
-	tname    string             // table name
-	cname    string             // column name
-	fname    string             // json field name
+	db       *dbhandle2.dbhandle2 // db handle
+	usingDBs []dbhandle2.DBtype   // array of db type of using
+	tname    string               // table name
+	cname    string               // column name
+	fname    string               // json field name
 	// v1.1 end
 	mu sync.Mutex
 }
@@ -50,13 +50,13 @@ func NewPersistentInt64(path string) (p *PersistentInt64, err error) {
 }
 
 // v1.1 start
-func NewPersistentIntWithDB64(db *dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt64, err error) {
+func NewPersistentIntWithDB64(db *dbhandle2.dbhandle2, tname string, cname string, fname string) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
 	//	p.path = path
 	p.db = db
-	p.usingDBs = []dbhandle.DBtype{dbhandle.SQLite, dbhandle.Mariadb, dbhandle.FireStore}
+	p.usingDBs = []dbhandle2.DBtype{dbhandle2.SQLite, dbhandle2.Mariadb, dbhandle2.FireStore}
 	p.tname = tname
 	p.cname = cname
 	p.fname = fname
@@ -68,13 +68,13 @@ func NewPersistentIntWithDB64(db *dbhandle.DBHandle, tname string, cname string,
 }
 
 // read from db, save all
-func NewPersistentIntWithDBAndPath64(db *dbhandle.DBHandle, tname string, cname string, fname string, path string) (p *PersistentInt64, err error) {
+func NewPersistentIntWithDBAndPath64(db *dbhandle2.dbhandle2, tname string, cname string, fname string, path string) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
 	p.path = path
 	p.db = db
-	p.usingDBs = []dbhandle.DBtype{dbhandle.SQLite, dbhandle.Mariadb, dbhandle.FireStore}
+	p.usingDBs = []dbhandle2.DBtype{dbhandle2.SQLite, dbhandle2.Mariadb, dbhandle2.FireStore}
 	p.tname = tname
 	p.cname = cname
 	p.fname = fname
@@ -86,13 +86,13 @@ func NewPersistentIntWithDBAndPath64(db *dbhandle.DBHandle, tname string, cname 
 }
 
 // read from path, save all
-func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt64, err error) {
+func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle2.dbhandle2, tname string, cname string, fname string) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
 	p.path = path
 	p.db = db
-	p.usingDBs = []dbhandle.DBtype{dbhandle.SQLite, dbhandle.Mariadb, dbhandle.FireStore}
+	p.usingDBs = []dbhandle2.DBtype{dbhandle2.SQLite, dbhandle2.Mariadb, dbhandle2.FireStore}
 	p.tname = tname
 	p.cname = cname
 	p.fname = fname
@@ -105,7 +105,7 @@ func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle.DBHandle, tname s
 }
 
 // read from path, save all
-func NewPersistentIntWithPATHAndDBUsing64(path string, db *dbhandle.DBHandle, tname string, cname string, fname string, usingDBs []dbhandle.DBtype) (p *PersistentInt64, err error) {
+func NewPersistentIntWithPATHAndDBUsing64(path string, db *dbhandle2.dbhandle2, tname string, cname string, fname string, usingDBs []dbhandle2.DBtype) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
@@ -126,15 +126,15 @@ func NewPersistentIntWithPATHAndDBUsing64(path string, db *dbhandle.DBHandle, tn
 func (i PersistentInt64) saveDB() (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
-	funcs := [...]func(chan dbhandle.ExitStatus) error{i.sqliteSave, i.mariadbSave, i.firebaseSave}
+	funcs := [...]func(chan dbhandle2.ExitStatus) error{i.sqliteSave, i.mariadbSave, i.firebaseSave}
 
-	c := make(chan dbhandle.ExitStatus, 6)
+	c := make(chan dbhandle2.ExitStatus, 6)
 	defer close(c)
 
 	for _, db := range i.usingDBs {
 		go funcs[db](c)
 	}
-	err = dbhandle.SaveUpdateErrorHandler(i.usingDBs, fmt.Sprintf("table counter"), c)
+	err = dbhandle2.SaveUpdateErrorHandler(i.usingDBs, fmt.Sprintf("table counter"), c)
 
 	/*
 		var errStr string
@@ -145,7 +145,7 @@ func (i PersistentInt64) saveDB() (err error) {
 				log.Println(err)
 			}
 		}
-		if i.db.MariadbHandle.Mariadbptr != nil {
+		if i.db.Mariadbhandle2.Mariadbptr != nil {
 			if err := i.mariadbSave(); err != nil {
 				errStr += err.Error()
 				log.Println(err)
@@ -161,7 +161,7 @@ func (i PersistentInt64) saveDB() (err error) {
 	return
 }
 
-func (i PersistentInt64) sqliteSave(c chan dbhandle.ExitStatus) (err error) {
+func (i PersistentInt64) sqliteSave(c chan dbhandle2.ExitStatus) (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	//	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
@@ -172,11 +172,11 @@ func (i PersistentInt64) sqliteSave(c chan dbhandle.ExitStatus) (err error) {
 		i.Value,
 	)
 	err = i.db.SQLiteHandle.Exec(query)
-	c <- dbhandle.ExitStatus{WhichDB: dbhandle.SQLite, Err: err}
+	c <- dbhandle2.ExitStatus{WhichDB: dbhandle2.SQLite, Err: err}
 	return
 }
 
-func (i PersistentInt64) mariadbSave(c chan dbhandle.ExitStatus) (err error) {
+func (i PersistentInt64) mariadbSave(c chan dbhandle2.ExitStatus) (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	//	query := fmt.Sprintf(`REPLACE INTO "%s" ("ID", "Attr") VALUES (%s, JSON_SET(ATTR, "$.%s", "%d")) WHERE ID="%s"`,
@@ -186,18 +186,18 @@ func (i PersistentInt64) mariadbSave(c chan dbhandle.ExitStatus) (err error) {
 		i.fname,
 		i.Value,
 	)
-	err = i.db.MariadbHandle.Exec(query)
-	c <- dbhandle.ExitStatus{WhichDB: dbhandle.Mariadb, Err: err}
+	err = i.db.Mariadbhandle2.Exec(query)
+	c <- dbhandle2.ExitStatus{WhichDB: dbhandle2.Mariadb, Err: err}
 	return
 }
 
-func (i PersistentInt64) firebaseSave(c chan dbhandle.ExitStatus) (err error) {
+func (i PersistentInt64) firebaseSave(c chan dbhandle2.ExitStatus) (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	err = i.db.FirebaseHandle.Set(i.tname, i.cname, map[string]interface{}{
 		i.fname: i.Value,
 	})
-	c <- dbhandle.ExitStatus{WhichDB: dbhandle.FireStore, Err: err}
+	c <- dbhandle2.ExitStatus{WhichDB: dbhandle2.FireStore, Err: err}
 	return
 }
 
@@ -210,8 +210,8 @@ func (i PersistentInt64) readDB() (value int64, err error) {
 		if value, err = funcs[db](); err == nil {
 			return
 		} else {
-			dbhandle.LogInconsistent.Println(fmt.Sprintf("err: db = %s", dbhandle.Const2dbmsName(db)))
-			dbhandle.LogInconsistent.Println(err)
+			dbhandle2.LogInconsistent.Println(fmt.Sprintf("err: db = %s", dbhandle2.Const2dbmsName(db)))
+			dbhandle2.LogInconsistent.Println(err)
 		}
 	}
 	return
@@ -232,7 +232,7 @@ func (i PersistentInt64) mariadbRead() (value int64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	query := fmt.Sprintf(`SELECT  json_extract(attr, "$.%s") FROM %s WHERE id="%s"`, i.fname, i.tname, i.cname)
-	if err = i.db.MariadbHandle.QueryRow(query, &value); err != nil {
+	if err = i.db.Mariadbhandle2.QueryRow(query, &value); err != nil {
 		log.Println(err)
 		return
 	}
