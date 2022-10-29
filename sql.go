@@ -31,7 +31,7 @@ func (i *PersistentInt64) createDB() (err error) {
 
 	// exec query
 	errStr := "create table failed." // err string in case
-	err = i.dbHandle.ExecIfNotTableExist(i.cname, i.dbArrayName, query, errStr)
+	err = i.db.ExecIfNotTableExist(i.cname, i.dbArrayName, query, errStr)
 
 	return
 }
@@ -42,7 +42,7 @@ func (i *PersistentInt64) readDB() (value int64, err error) {
 	// make Query string
 	var querybuilder qb.Query
 	querybuilder.SetTableName(i.tname)
-	queryStr := querybuilder.Select([]string{"Value"}).Where(qb.Equal("ID", i.cname)).QueryString()
+	queryStr := querybuilder.Select([]interface{}{"Value"}).Where(qb.Equal("ID", i.cname)).QueryString()
 
 	// make Query struct
 	/*	query := new(dbhandle.Query)
