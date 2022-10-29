@@ -67,7 +67,7 @@ func (i *PersistentInt64) saveDB() (err error) {
 	query.DefaultQueryStr = queryStr
 
 	errStr := fmt.Sprintf("id = %v", i.cname)
-	err = i.db.Exec(i.dbArrayName, query, errStr)
+	err = i.db.Exec(i.dbArrayName, &query, errStr)
 
 	return
 }
