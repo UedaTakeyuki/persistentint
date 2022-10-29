@@ -8,6 +8,7 @@ package persistentint
 import (
 	"errors"
 	"io/ioutil"
+	"log"
 	"os"
 	"strconv"
 	"sync"
@@ -61,6 +62,9 @@ func NewPersistentIntWithDB64(db *dbhandle2.DBHandle, dbArrayName string, tname 
 	//	p.fname = fname
 	//	filebuffs, err := ioutil.ReadFile(p.path)
 	//	p.Value, err = strconv.Atoi(string(filebuffs))
+	if err = p.createDB(); err != nil {
+		log.Println(err)
+	}
 	p.Value, err = p.readDB()
 
 	return
@@ -80,6 +84,9 @@ func NewPersistentIntWithDBAndPath64(db *dbhandle2.DBHandle, dbArrayName string,
 	//	p.fname = fname
 	//	filebuffs, err := ioutil.ReadFile(p.path)
 	//	p.Value, err = strconv.Atoi(string(filebuffs))
+	if err = p.createDB(); err != nil {
+		log.Println(err)
+	}
 	p.Value, err = p.readDB()
 
 	return
@@ -101,6 +108,9 @@ func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle2.DBHandle, dbArra
 	p.Value, err = strconv.ParseInt(string(filebuffs), 10, 64)
 	//	p.Value, err = strconv.Atoi(string(filebuffs))
 	//	p.Value, err = p.readDB()
+	if err = p.createDB(); err != nil {
+		log.Println(err)
+	}
 
 	return
 }
@@ -121,6 +131,9 @@ func NewPersistentIntWithPATHAndDBUsing64(path string, db *dbhandle2.DBHandle, d
 	p.Value, err = strconv.ParseInt(string(filebuffs), 10, 64)
 	//	p.Value, err = strconv.Atoi(string(filebuffs))
 	//	p.Value, err = p.readDB()
+	if err = p.createDB(); err != nil {
+		log.Println(err)
+	}
 
 	return
 }
