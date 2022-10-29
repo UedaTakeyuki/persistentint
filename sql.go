@@ -16,8 +16,7 @@ import (
 
 const sqlCreateTableForCounter = `CREATE TABLE IF NOT EXISTS %s (
 	ID       VARCHAR(16) PRIMARY KEY, 
-	Value    INT,
-	CHECK (JSON_VALID(attr))
+	Value    INT
 	)`
 
 func (i *PersistentInt64) createDB() (err error) {
