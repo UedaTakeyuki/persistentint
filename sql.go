@@ -63,11 +63,11 @@ func (i *PersistentInt64) saveDB() (err error) {
 	queryStr := querybuilder.Update([]qb.Param{{Name: "Value", Value: i.Value}}).Where(qb.Equal("ID", i.cname)).QueryString()
 
 	// make Query struct
-	query := new(dbhandle.Query)
+	query := dbhandle.Query{}
 	query.DefaultQueryStr = queryStr
 
 	errStr := fmt.Sprintf("id = %v", i.cname)
-	err = i.db.Exec(i.dbArrayName, &query, errStr)
+	err = i.db.Exec(i.dbArrayName, query, errStr)
 
 	return
 }
