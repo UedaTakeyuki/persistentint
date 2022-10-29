@@ -30,7 +30,7 @@ func (i *PersistentInt64) createDB() (err error) {
 
 	// exec query
 	errStr := "create table failed." // err string in case
-	err = i.db.ExecIfNotTableExist(i.cname, i.dbArrayName, query, errStr)
+	err = i.db.ExecIfNotTableExist(i.tname, i.dbArrayName, query, errStr)
 
 	return
 }
