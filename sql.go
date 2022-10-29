@@ -36,7 +36,7 @@ func (i *PersistentInt64) createDB() (err error) {
 	return
 }
 
-func (i *PersistentInt64) readDB() (err error) {
+func (i *PersistentInt64) readDB() (value int64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	// make Query string
@@ -48,7 +48,9 @@ func (i *PersistentInt64) readDB() (err error) {
 		query.DefaultQueryStr = queryStr */
 
 	errStr := fmt.Sprintf("id = %v", i.cname)
-	err = i.db.QueryRow(i.dbArrayName, queryStr, errStr, &i.Value)
+	err = i.db.QueryRow(i.dbArrayName, queryStr, errStr, &value)
+
+	return
 }
 
 func (i *PersistentInt64) saveDB() (err error) {
@@ -60,4 +62,6 @@ func (i *PersistentInt64) saveDB() (err error) {
 
 	errStr := fmt.Sprintf("id = %v", i.cname)
 	err = i.db.Exec(i.dbArrayName, queryStr, errStr)
+
+	return
 }
