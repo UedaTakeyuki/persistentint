@@ -49,7 +49,7 @@ func NewPersistentInt64(path string) (p *PersistentInt64, err error) {
 }
 
 // v1.1 start
-func NewPersistentIntWithDB64(db *dbhandle2.DBHandle, dbArrayName string, tname string, cname string, fname string) (p *PersistentInt64, err error) {
+func NewPersistentIntWithDB64(db *dbhandle2.DBHandle, dbArrayName string, tname string, cname string) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
@@ -71,7 +71,7 @@ func NewPersistentIntWithDB64(db *dbhandle2.DBHandle, dbArrayName string, tname 
 }
 
 // read from db, save all
-func NewPersistentIntWithDBAndPath64(db *dbhandle2.DBHandle, dbArrayName string, tname string, cname string, fname string, path string) (p *PersistentInt64, err error) {
+func NewPersistentIntWithDBAndPath64(db *dbhandle2.DBHandle, dbArrayName string, tname string, cname string, path string) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
@@ -93,7 +93,7 @@ func NewPersistentIntWithDBAndPath64(db *dbhandle2.DBHandle, dbArrayName string,
 }
 
 // read from path, save all
-func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle2.DBHandle, dbArrayName string, tname string, cname string, fname string) (p *PersistentInt64, err error) {
+func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle2.DBHandle, dbArrayName string, tname string, cname string) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
@@ -116,7 +116,7 @@ func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle2.DBHandle, dbArra
 }
 
 // read from path, save all
-func NewPersistentIntWithPATHAndDBUsing64(path string, db *dbhandle2.DBHandle, dbArrayName string, tname string, cname string, fname string, usingDBs []dbhandle2.DBtype) (p *PersistentInt64, err error) {
+func NewPersistentIntWithPATHAndDBUsing64(path string, db *dbhandle2.DBHandle, dbArrayName string, tname string, cname string, usingDBs []dbhandle2.DBtype) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
