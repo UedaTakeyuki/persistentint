@@ -31,7 +31,7 @@ func (i *PersistentInt64) createDB() (err error) {
 
 	// exec query
 	errStr := "create table failed." // err string in case
-	err = d.dbHandle.ExecIfNotTableExist(i.cname, i.dbArrayName, query, errStr)
+	err = i.dbHandle.ExecIfNotTableExist(i.cname, i.dbArrayName, query, errStr)
 
 	return
 }
@@ -40,8 +40,9 @@ func (i *PersistentInt64) readDB() (value int64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	// make Query string
-	qb.SetTableName(i.tname)
-	queryStr := qb.Select([]string{"Value"}).Where(qb.Equal("ID", i.cname)).QueryString()
+	var querybuilder qb.Query
+	querybuilder.SetTableName(i.tname)
+	queryStr := querybuilder.Select([]string{"Value"}).Where(qb.Equal("ID", i.cname)).QueryString()
 
 	// make Query struct
 	/*	query := new(dbhandle.Query)
@@ -57,8 +58,9 @@ func (i *PersistentInt64) saveDB() (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	// make Query string
-	qb.SetTableName(i.tname)
-	queryStr := qb.Update([]qb.Param{{Name: "Value", Value: i.Value}}).Where(qb.Equal("ID", i.cname)).QueryString()
+	var querybuilder qb.Query
+	querybuilder.SetTableName(i.tname)
+	queryStr := querybuilder.Update([]qb.Param{{Name: "Value", Value: i.Value}}).Where(qb.Equal("ID", i.cname)).QueryString()
 
 	errStr := fmt.Sprintf("id = %v", i.cname)
 	err = i.db.Exec(i.dbArrayName, queryStr, errStr)
