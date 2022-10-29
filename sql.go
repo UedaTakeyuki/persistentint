@@ -58,8 +58,8 @@ func (i *PersistentInt64) saveDB() (err error) {
 
 	// make Query string
 	var querybuilder qb.Query
-	querybuilder.SetTableName(persistentints)
-	queryStr := querybuilder.ReplaceInto([]qb.Param{{NAME: "ID", Value: i.cname}, {Name: "Value", Value: i.Value}}).Where(qb.Equal("ID", i.cname)).QueryString()
+	querybuilder.SetTableName("persistentints")
+	queryStr := querybuilder.ReplaceInto([]qb.Param{{Name: "ID", Value: i.cname}, {Name: "Value", Value: i.Value}}).Where(qb.Equal("ID", i.cname)).QueryString()
 
 	// make Query struct
 	query := dbhandle.Query{}
