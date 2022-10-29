@@ -42,7 +42,7 @@ func (i *PersistentInt64) readDB() (value int64, err error) {
 	// make Query string
 	var querybuilder qb.Query
 	querybuilder.SetTableName(i.tname)
-	queryStr := querybuilder.Select([]interface{}{"Value"}).Where(qb.Equal("ID", i.cname)).QueryString()
+	queryStr := querybuilder.Select([]string{"Value"}).Where(qb.Equal("ID", i.cname)).QueryString()
 
 	// make Query struct
 	/*	query := new(dbhandle.Query)
