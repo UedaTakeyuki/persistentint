@@ -26,9 +26,9 @@ type PersistentInt64 struct {
 	path  string
 	// v1.1 start
 	// for db
-	db          *dbhandle2.dbhandle2 // db handle
-	dbArrayName string               // name of dbArray which is the set of using dbs defined with db handle
-	//usingDBs []dbhandle2.DBtype    // array of db type of using
+	db          *dbhandle2.DBHandle // db handle
+	dbArrayName string              // name of dbArray which is the set of using dbs defined with db handle
+	//usingDBs []dbhandle2.DBtype   // array of db type of using
 	tname string // table name
 	cname string // column name
 	//	fname       string               // json field name
