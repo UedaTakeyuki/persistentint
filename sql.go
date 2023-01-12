@@ -30,7 +30,7 @@ func (i *PersistentInt64) createDB() (err error) {
 
 	// exec query
 	errStr := "create table failed." // err string in case
-	err = i.db.ExecIfNotTableExist(i.tname, i.dbArrayName, query, errStr)
+	err = i.db.ExecIfNotTableExist(i.tname, query, errStr)
 
 	return
 }
@@ -48,7 +48,7 @@ func (i *PersistentInt64) readDB() (value int64, err error) {
 		query.DefaultQueryStr = queryStr */
 
 	errStr := fmt.Sprintf("id = %v", i.cname)
-	err = i.db.QueryRow(i.dbArrayName, queryStr, errStr, &value)
+	err = i.db.QueryRow(queryStr, errStr, &value)
 
 	return
 }
@@ -66,7 +66,7 @@ func (i *PersistentInt64) saveDB() (err error) {
 	query.DefaultQueryStr = queryStr
 
 	errStr := fmt.Sprintf("id = %v", i.cname)
-	err = i.db.Exec(i.dbArrayName, query, errStr)
+	err = i.db.Exec(query, errStr)
 
 	return
 }
