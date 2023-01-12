@@ -27,8 +27,8 @@ type PersistentInt64 struct {
 	path  string
 	// v1.1 start
 	// for db
-	db          *dbhandle2.DBHandle // db handle
-	dbArrayName string              // name of dbArray which is the set of using dbs defined with db handle
+	db *dbhandle2.DBHandle // db handle
+	//	dbArrayName string              // name of dbArray which is the set of using dbs defined with db handle
 	//usingDBs []dbhandle2.DBtype   // array of db type of using
 	tname string // table name
 	cname string // column name
@@ -49,13 +49,13 @@ func NewPersistentInt64(path string) (p *PersistentInt64, err error) {
 }
 
 // v1.1 start
-func NewPersistentIntWithDB64(db *dbhandle2.DBHandle, dbArrayName string, tname string, cname string) (p *PersistentInt64, err error) {
+func NewPersistentIntWithDB64(db *dbhandle2.DBHandle, tname string, cname string) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
 	//	p.path = path
 	p.db = db
-	p.dbArrayName = dbArrayName
+	//	p.dbArrayName = dbArrayName
 	//	p.usingDBs = []dbhandle2.DBtype{dbhandle2.SQLite, dbhandle2.Mariadb, dbhandle2.FireStore}
 	p.tname = tname
 	p.cname = cname
@@ -71,13 +71,13 @@ func NewPersistentIntWithDB64(db *dbhandle2.DBHandle, dbArrayName string, tname 
 }
 
 // read from db, save all
-func NewPersistentIntWithDBAndPath64(db *dbhandle2.DBHandle, dbArrayName string, tname string, cname string, path string) (p *PersistentInt64, err error) {
+func NewPersistentIntWithDBAndPath64(db *dbhandle2.DBHandle, tname string, cname string, path string) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
 	p.path = path
 	p.db = db
-	p.dbArrayName = dbArrayName
+	//	p.dbArrayName = dbArrayName
 	//	p.usingDBs = []dbhandle2.DBtype{dbhandle2.SQLite, dbhandle2.Mariadb, dbhandle2.FireStore}
 	p.tname = tname
 	p.cname = cname
@@ -93,13 +93,13 @@ func NewPersistentIntWithDBAndPath64(db *dbhandle2.DBHandle, dbArrayName string,
 }
 
 // read from path, save all
-func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle2.DBHandle, dbArrayName string, tname string, cname string) (p *PersistentInt64, err error) {
+func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle2.DBHandle, tname string, cname string) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
 	p.path = path
 	p.db = db
-	p.dbArrayName = dbArrayName
+	//	p.dbArrayName = dbArrayName
 	//	p.usingDBs = []dbhandle2.DBtype{dbhandle2.SQLite, dbhandle2.Mariadb, dbhandle2.FireStore}
 	p.tname = tname
 	p.cname = cname
@@ -116,13 +116,13 @@ func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle2.DBHandle, dbArra
 }
 
 // read from path, save all
-func NewPersistentIntWithPATHAndDBUsing64(path string, db *dbhandle2.DBHandle, dbArrayName string, tname string, cname string, usingDBs []dbhandle2.DBtype) (p *PersistentInt64, err error) {
+func NewPersistentIntWithPATHAndDBUsing64(path string, db *dbhandle2.DBHandle, tname string, cname string, usingDBs []dbhandle2.DBtype) (p *PersistentInt64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt64)
 	p.path = path
 	p.db = db
-	p.dbArrayName = dbArrayName
+	//	p.dbArrayName = dbArrayName
 	//	p.usingDBs = usingDBs
 	p.tname = tname
 	p.cname = cname
