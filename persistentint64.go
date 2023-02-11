@@ -322,3 +322,16 @@ func (i *PersistentInt64) Add(j int64) (value int64, err error) {
 	err = i.Save()
 	return
 }
+
+func (i *PersistentInt64) Set(j int64) (value int64, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+
+	// lock
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
+	i.Value = j
+	value = i.Value
+	err = i.Save()
+	return
+}
