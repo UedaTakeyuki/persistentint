@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
 	"strconv"
 	"sync"
 
@@ -304,8 +305,11 @@ func (i *PersistentInt64) Inc() (value int64, err error) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
+	log.Println("before Value++:", runtime.NumGoroutine(), i.Value)
 	i.Value++
+	log.Println("after Value++:", runtime.NumGoroutine(), i.Value)
 	value = i.Value
+	log.Println("after value = i.Value:", runtime.NumGoroutine(), i.Value, value)
 	err = i.Save()
 	return
 }
