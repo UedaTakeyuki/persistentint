@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"runtime"
 	"strconv"
 	"sync"
 
@@ -24,7 +23,7 @@ import (
 
 // PersistentInt
 type PersistentInt64 struct {
-	Value int64
+	value int64
 	path  string
 	// v1.1 start
 	// for db
@@ -44,7 +43,7 @@ func NewPersistentInt64(path string) (p *PersistentInt64, err error) {
 	p = new(PersistentInt64)
 	p.path = path
 	filebuffs, err := ioutil.ReadFile(p.path)
-	p.Value, err = strconv.ParseInt(string(filebuffs), 10, 64)
+	p.value, err = strconv.ParseInt(string(filebuffs), 10, 64)
 
 	return
 }
@@ -62,11 +61,11 @@ func NewPersistentIntWithDB64(db *dbhandle2.DBHandle, tname string, cname string
 	p.cname = cname
 	//	p.fname = fname
 	//	filebuffs, err := ioutil.ReadFile(p.path)
-	//	p.Value, err = strconv.Atoi(string(filebuffs))
+	//	p.value, err = strconv.Atoi(string(filebuffs))
 	if err = p.createDB(); err != nil {
 		log.Println(err)
 	}
-	p.Value, err = p.readDB()
+	p.value, err = p.readDB()
 
 	return
 }
@@ -84,11 +83,11 @@ func NewPersistentIntWithDBAndPath64(db *dbhandle2.DBHandle, tname string, cname
 	p.cname = cname
 	//	p.fname = fname
 	//	filebuffs, err := ioutil.ReadFile(p.path)
-	//	p.Value, err = strconv.Atoi(string(filebuffs))
+	//	p.value, err = strconv.Atoi(string(filebuffs))
 	if err = p.createDB(); err != nil {
 		log.Println(err)
 	}
-	p.Value, err = p.readDB()
+	p.value, err = p.readDB()
 
 	return
 }
@@ -106,9 +105,9 @@ func NewPersistentIntWithPATHAndDB64(path string, db *dbhandle2.DBHandle, tname 
 	p.cname = cname
 	//	p.fname = fname
 	filebuffs, err := ioutil.ReadFile(p.path)
-	p.Value, err = strconv.ParseInt(string(filebuffs), 10, 64)
-	//	p.Value, err = strconv.Atoi(string(filebuffs))
-	//	p.Value, err = p.readDB()
+	p.value, err = strconv.ParseInt(string(filebuffs), 10, 64)
+	//	p.value, err = strconv.Atoi(string(filebuffs))
+	//	p.value, err = p.readDB()
 	if err = p.createDB(); err != nil {
 		log.Println(err)
 	}
@@ -129,9 +128,9 @@ func NewPersistentIntWithPATHAndDBUsing64(path string, db *dbhandle2.DBHandle, t
 	p.cname = cname
 	//	p.fname = fname
 	filebuffs, err := ioutil.ReadFile(p.path)
-	p.Value, err = strconv.ParseInt(string(filebuffs), 10, 64)
-	//	p.Value, err = strconv.Atoi(string(filebuffs))
-	//	p.Value, err = p.readDB()
+	p.value, err = strconv.ParseInt(string(filebuffs), 10, 64)
+	//	p.value, err = strconv.Atoi(string(filebuffs))
+	//	p.value, err = p.readDB()
 	if err = p.createDB(); err != nil {
 		log.Println(err)
 	}
@@ -186,7 +185,7 @@ func (i PersistentInt64) sqliteSave(c chan dbhandle2.ExitStatus) (err error) {
 		i.tname,
 		i.cname,
 		i.fname,
-		i.Value,
+		i.value,
 	)
 	err = i.db.SQLiteHandle.Exec(query)
 	c <- dbhandle2.ExitStatus{WhichDB: dbhandle2.SQLite, Err: err}
@@ -201,7 +200,7 @@ func (i PersistentInt64) mariadbSave(c chan dbhandle2.ExitStatus) (err error) {
 		i.tname,
 		i.cname,
 		i.fname,
-		i.Value,
+		i.value,
 	)
 	err = i.db.Mariadbhandle2.Exec(query)
 	c <- dbhandle2.ExitStatus{WhichDB: dbhandle2.Mariadb, Err: err}
@@ -211,7 +210,7 @@ func (i PersistentInt64) firebaseSave(c chan dbhandle2.ExitStatus) (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	err = i.db.FirebaseHandle.Set(i.tname, i.cname, map[string]interface{}{
-		i.fname: i.Value,
+		i.fname: i.value,
 	})
 	c <- dbhandle2.ExitStatus{WhichDB: dbhandle2.FireStore, Err: err}
 	return
@@ -279,7 +278,7 @@ func (i PersistentInt64) Save() (err error) {
 	var dbErr error
 	// v1.1 start
 	if i.path != "" {
-		pathErr = ioutil.WriteFile(i.path, []byte(strconv.FormatInt(i.Value, 10)), os.FileMode(0600))
+		pathErr = ioutil.WriteFile(i.path, []byte(strconv.FormatInt(i.value, 10)), os.FileMode(0600))
 	}
 	if i.db != nil {
 		dbErr = i.saveDB()
@@ -305,11 +304,8 @@ func (i *PersistentInt64) Inc() (value int64, err error) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
-	log.Println("before Value++:", runtime.NumGoroutine(), i.Value)
-	i.Value++
-	log.Println("after Value++:", runtime.NumGoroutine(), i.Value)
-	value = i.Value
-	log.Println("after value = i.Value:", runtime.NumGoroutine(), i.Value, value)
+	i.value++
+	value = i.value
 	err = i.Save()
 	return
 }
@@ -321,8 +317,8 @@ func (i *PersistentInt64) Add(j int64) (value int64, err error) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
-	i.Value += j
-	value = i.Value
+	i.value += j
+	value = i.value
 	err = i.Save()
 	return
 }
@@ -334,8 +330,8 @@ func (i *PersistentInt64) Set(j int64) (value int64, err error) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
-	i.Value = j
-	value = i.Value
+	i.value = j
+	value = i.value
 	err = i.Save()
 	return
 }
