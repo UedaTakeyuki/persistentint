@@ -23,7 +23,7 @@ import (
 
 // PersistentInt
 type PersistentInt struct {
-	Value int
+	value int
 	path  string
 	// v1.1 start
 	// for db
@@ -42,7 +42,7 @@ func NewPersistentInt(path string) (p *PersistentInt, err error) {
 	p = new(PersistentInt)
 	p.path = path
 	filebuffs, err := ioutil.ReadFile(p.path)
-	p.Value, err = strconv.Atoi(string(filebuffs))
+	p.value, err = strconv.Atoi(string(filebuffs))
 
 	return
 }
@@ -63,7 +63,7 @@ func NewPersistentIntWithDB(db *dbhandle2.DBHandle, tname string, cname string /
 	if err = p.createDB(); err != nil {
 		log.Println(err)
 	}
-	p.Value, err = p.readDB()
+	p.value, err = p.readDB()
 
 	return
 }
@@ -84,7 +84,7 @@ func NewPersistentIntWithDBAndPath(db *dbhandle2.DBHandle, tname string, cname s
 	if err = p.createDB(); err != nil {
 		log.Println(err)
 	}
-	p.Value, err = p.readDB()
+	p.value, err = p.readDB()
 
 	return
 }
@@ -101,7 +101,7 @@ func NewPersistentIntWithPATHAndDB(path string, db *dbhandle2.DBHandle, tname st
 	p.cname = cname
 	//p.fname = fname
 	filebuffs, err := ioutil.ReadFile(p.path)
-	p.Value, err = strconv.Atoi(string(filebuffs))
+	p.value, err = strconv.Atoi(string(filebuffs))
 	//	p.Value, err = p.readDB()
 	if err = p.createDB(); err != nil {
 		log.Println(err)
@@ -122,7 +122,7 @@ func NewPersistentIntWithPATHAndDBUsing(path string, db *dbhandle2.DBHandle, tna
 	p.cname = cname
 	//p.fname = fname
 	filebuffs, err := ioutil.ReadFile(p.path)
-	p.Value, err = strconv.Atoi(string(filebuffs))
+	p.value, err = strconv.Atoi(string(filebuffs))
 	if err = p.createDB(); err != nil {
 		log.Println(err)
 	}
@@ -276,8 +276,8 @@ func (i *PersistentInt) Inc() (value int, err error) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
-	i.Value++
-	value = i.Value
+	i.value++
+	value = i.value
 	err = i.Save()
 	return
 }
@@ -289,13 +289,13 @@ func (i *PersistentInt) Add(j int) (value int, err error) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
-	i.Value += j
-	value = i.Value
+	i.value += j
+	value = i.value
 	err = i.Save()
 	return
 }
 
-func (i *PersistentInt) Set(j int64) (value int, err error) {
+func (i *PersistentInt) Set(j int) (value int, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	// lock
