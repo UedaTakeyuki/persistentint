@@ -6,7 +6,6 @@
 package persistentint
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -16,10 +15,9 @@ import (
 	// v1.1
 
 	"errors"
-	"reflect"
 	"time"
 
-	"github.com/UedaTakeyuki/dbhandle"
+	"github.com/UedaTakeyuki/dbhandle2"
 	"github.com/UedaTakeyuki/erapse"
 )
 
@@ -29,11 +27,11 @@ type PersistentInt struct {
 	path  string
 	// v1.1 start
 	// for db
-	db       *dbhandle.DBHandle // db handle
-	usingDBs []dbhandle.DBtype  // array of db type of using
-	tname    string             // table name
-	cname    string             // column name
-	fname    string             // json field name
+	db *dbhandle2.DBHandle // db handle
+	//usingDBs []dbhandle.DBtype  // array of db type of using
+	tname string // table name
+	cname string // column name
+	//fname    string             // json field name
 	// v1.1 end
 	mu sync.Mutex
 }
@@ -50,77 +48,90 @@ func NewPersistentInt(path string) (p *PersistentInt, err error) {
 }
 
 // v1.1 start
-func NewPersistentIntWithDB(db *dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt, err error) {
+func NewPersistentIntWithDB(db *dbhandle2.DBHandle, tname string, cname string /*, fname string*/) (p *PersistentInt, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt)
 	//	p.path = path
 	p.db = db
-	p.usingDBs = []dbhandle.DBtype{dbhandle.SQLite, dbhandle.Mariadb, dbhandle.FireStore}
+	//p.usingDBs = []dbhandle.DBtype{dbhandle.SQLite, dbhandle.Mariadb, dbhandle.FireStore}
 	p.tname = tname
 	p.cname = cname
-	p.fname = fname
+	//p.fname = fname
 	//	filebuffs, err := ioutil.ReadFile(p.path)
 	//	p.Value, err = strconv.Atoi(string(filebuffs))
+	if err = p.createDB(); err != nil {
+		log.Println(err)
+	}
 	p.Value, err = p.readDB()
 
 	return
 }
 
 // read from db, save all
-func NewPersistentIntWithDBAndPath(db *dbhandle.DBHandle, tname string, cname string, fname string, path string) (p *PersistentInt, err error) {
+func NewPersistentIntWithDBAndPath(db *dbhandle2.DBHandle, tname string, cname string /*, fname string*/, path string) (p *PersistentInt, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt)
 	p.path = path
 	p.db = db
-	p.usingDBs = []dbhandle.DBtype{dbhandle.SQLite, dbhandle.Mariadb, dbhandle.FireStore}
+	//p.usingDBs = []dbhandle.DBtype{dbhandle.SQLite, dbhandle.Mariadb, dbhandle.FireStore}
 	p.tname = tname
 	p.cname = cname
-	p.fname = fname
+	//p.fname = fname
 	//	filebuffs, err := ioutil.ReadFile(p.path)
 	//	p.Value, err = strconv.Atoi(string(filebuffs))
+	if err = p.createDB(); err != nil {
+		log.Println(err)
+	}
 	p.Value, err = p.readDB()
 
 	return
 }
 
 // read from path, save all
-func NewPersistentIntWithPATHAndDB(path string, db *dbhandle.DBHandle, tname string, cname string, fname string) (p *PersistentInt, err error) {
+func NewPersistentIntWithPATHAndDB(path string, db *dbhandle2.DBHandle, tname string, cname string /*, fname string*/) (p *PersistentInt, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt)
 	p.path = path
 	p.db = db
-	p.usingDBs = []dbhandle.DBtype{dbhandle.SQLite, dbhandle.Mariadb, dbhandle.FireStore}
+	//p.usingDBs = []dbhandle.DBtype{dbhandle.SQLite, dbhandle.Mariadb, dbhandle.FireStore}
 	p.tname = tname
 	p.cname = cname
-	p.fname = fname
+	//p.fname = fname
 	filebuffs, err := ioutil.ReadFile(p.path)
 	p.Value, err = strconv.Atoi(string(filebuffs))
 	//	p.Value, err = p.readDB()
+	if err = p.createDB(); err != nil {
+		log.Println(err)
+	}
 
 	return
 }
 
 // read from path, save all
-func NewPersistentIntWithPATHAndDBUsing(path string, db *dbhandle.DBHandle, tname string, cname string, fname string, usingDBs []dbhandle.DBtype) (p *PersistentInt, err error) {
+func NewPersistentIntWithPATHAndDBUsing(path string, db *dbhandle2.DBHandle, tname string, cname string /*, fname string*/, usingDBs []dbhandle2.DBtype) (p *PersistentInt, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	p = new(PersistentInt)
 	p.path = path
 	p.db = db
-	p.usingDBs = usingDBs
+	//p.usingDBs = usingDBs
 	p.tname = tname
 	p.cname = cname
-	p.fname = fname
+	//p.fname = fname
 	filebuffs, err := ioutil.ReadFile(p.path)
 	p.Value, err = strconv.Atoi(string(filebuffs))
+	if err = p.createDB(); err != nil {
+		log.Println(err)
+	}
 	//	p.Value, err = p.readDB()
 
 	return
 }
 
+/*
 func (i PersistentInt) saveDB() (err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
@@ -134,27 +145,6 @@ func (i PersistentInt) saveDB() (err error) {
 	}
 	err = dbhandle.SaveUpdateErrorHandler(i.usingDBs, fmt.Sprintf("table counter"), c)
 
-	/*
-		var errStr string
-
-		if i.db.SQLiteHandle.SQLiteptr != nil {
-			if err := i.sqliteSave(); err != nil {
-				errStr += err.Error()
-				log.Println(err)
-			}
-		}
-		if i.db.MariadbHandle.Mariadbptr != nil {
-			if err := i.mariadbSave(); err != nil {
-				errStr += err.Error()
-				log.Println(err)
-			}
-		}
-		if i.db.FirebaseHandle.Client != nil {
-			if err := i.firebaseSave(); err != nil {
-				errStr += err.Error()
-				log.Panicln(err)
-			}
-		}*/
 	return
 }
 
@@ -250,7 +240,7 @@ func (i PersistentInt) firebaseRead() (value int, err error) {
 
 	return
 }
-
+*/
 // v1.1 end
 
 func (i PersistentInt) Save() (err error) {
@@ -301,6 +291,19 @@ func (i *PersistentInt) Add(j int) (value int, err error) {
 
 	i.Value += j
 	value = i.Value
+	err = i.Save()
+	return
+}
+
+func (i *PersistentInt) Set(j int64) (value int, err error) {
+	defer erapse.ShowErapsedTIme(time.Now())
+
+	// lock
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
+	i.value = j
+	value = i.value
 	err = i.Save()
 	return
 }
