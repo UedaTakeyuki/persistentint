@@ -51,7 +51,7 @@ func (i *PersistentInt) createDB() (err error) {
 	return
 }
 
-func (i *PersistentInt64) readDB() (value int, err error) {
+func (i *PersistentInt64) readDB() (value int64, err error) {
 	defer erapse.ShowErapsedTIme(time.Now())
 
 	// make Query string
